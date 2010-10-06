@@ -102,9 +102,9 @@ class ClosureTask extends Task
 	 * The target location to which output should be direted. If merge is set
 	 * then this should be a file. Otherwise it should be a target directory.
 	 */
-	public function setTarget($target)
+	public function setTarget(PhingFile $target)
 	{
-		$this->_target = (string) $target;
+		$this->_target = $target;
 	}
 	
 	
@@ -167,7 +167,6 @@ class ClosureTask extends Task
 	 */
 	public function main()
 	{
-		
 	}
 	
 	
@@ -186,7 +185,7 @@ class ClosureTask extends Task
 		}
 		
 		$cmd = escapeshellcmd("java -jar $this->_compiler_path --charset $this->_charset --compilation_level $this->_compilation_level --js_output_file $target --js $input");
-		$this->log($this->_verbose ? $cmd : 'Compiling: ' . $target);
+		$this->log('Compiling: ' . $target);
 		exec($cmd, $output, $return);
 		
 		if ($return !== 0) {

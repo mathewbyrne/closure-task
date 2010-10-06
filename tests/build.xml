@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="closuretask" default="compile-src-fileset">
+	
+    <taskdef name="closure" classname="ClosureTask">
+		<classpath dir="../tasks" />
+	</taskdef>
+	
+    <target name="compile-src-fileset" description="Compile all files using a fileset">
+        <closure target="build">
+            <fileset dir="src">
+                <include name="*.js" />
+            </fileset>
+        </closure>
+    </target>
+	
+	<target name="compile-src-filelist" description="Compile all files using a filelist">
+        <closure target="build">
+            <fileset dir="src" files="foo.js,bar.js"></fileset>
+        </closure>
+    </target>
+    
+    <target name="compile-src-merge-fileset" description="Merge files into one using a fileset">
+        <closure target="build/merged.js" merge="true">
+            <fileset dir="src">
+                <include name="*.js" />
+            </fileset>
+        </closure>
+    </target>
+	
+	<target name="compile-single-file" description="Compile a single file.">
+		<closure file="src/foo.js" target="build"></closure>
+	</target>
+	
+</project>
