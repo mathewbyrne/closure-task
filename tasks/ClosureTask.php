@@ -251,6 +251,11 @@ class ClosureTask extends Task
 	 */
 	protected function _compile($file, $target)
 	{
+		// Verify that we're not about to overwrite the source file.
+		if ($file->getAbsolutePath() == $target->getAbsolutePath()) {
+			throw new BuildException('Source file cannot compile to itself.');
+		}
+		
 		// Verify that the target is not a directory.
 		if ($target->isDirectory()) {
 			throw new BuildException($this->_merge ? 'Merge target must be a file.'
