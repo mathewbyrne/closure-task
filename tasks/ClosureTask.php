@@ -4,7 +4,9 @@
  * ClosureTask
  * 
  * A phing task for compiling Javascript files using the Google Closure 
- * compiler. Based on http://github.com/JanGorman/ClosureTask
+ * compiler, http://code.google.com/closure/compiler/
+ * 
+ * Adapted from http://github.com/JanGorman/ClosureTask
  */
 
 
