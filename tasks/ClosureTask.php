@@ -61,15 +61,9 @@ class ClosureTask extends Task
 	
 	
 	/**
-	 * An array of file lists to compile.
+	 * An array of FileList and FileSet objects to compile.
 	 */
-	protected $_file_lists = array();
-	
-	
-	/**
-	 * An array of file sets to compile.
-	 */
-	protected $_file_sets = array();
+	protected $_file_collections = array();
 	
 	
 	/**
@@ -133,8 +127,7 @@ class ClosureTask extends Task
 	 */
 	function createFileList()
 	{
-		$num = array_push($this->_file_lists, new FileList());
-		return $this->_file_lists[$num-1];
+		return $this->_createFileCollection(new FileList());
 	}
 	
 	
@@ -144,8 +137,14 @@ class ClosureTask extends Task
 	 */
 	public function createFileSet()
 	{
-		$num = array_push($this->_file_sets, new FileSet());
-		return $this->_file_sets[$num - 1];
+		return $this->_createFileCollection(new FileSet());
+	}
+	
+	
+	protected function _createFileCollection($collection)
+	{
+		array_push($this->_file_collections, $collection);
+		return $collection;
 	}
 	
 	
@@ -167,25 +166,82 @@ class ClosureTask extends Task
 	 */
 	public function main()
 	{
+		if ($this->_file === null && !count($this->_file_collections)) {
+			throw new BuildException("At least one of the file attributes, a fileset element or a filelist element must be specified.");
+		}
+		
+		if ($this->_merge) {
+			$merge_files = array();
+		}
+		
+		// Handle individual files.
+		if ($this->_file instanceof PhingFile)
+		{
+			//if ($this->_merge) {
+			//	$merge_files[] = $this->_file;
+			//} else {
+			//	$this->_compile($file, $target);
+			//}
+		}
+		
+		// Handle FileSets and FileLists
+		foreach ($this->_file_collections as $collection)
+		{
+			if ($collection instanceof FileSet) {
+				$files = $collection->getDirectoryScanner($this->project)->getIncludedFiles();				
+			} else {
+				$files = $collection->getFiles($this->project);
+			}
+
+			$path = realpath($collection->getDir($this->project));
+			
+			foreach ($files as $file_name)
+			{
+				$file = new PhingFile($path, $file_name);
+				
+				if ($this->_merge)
+				{
+					$merge_files[] = $file;
+				}
+				else
+				{
+					$target = new PhingFile($this->_target, $file_name);
+					$this->_compile($file, $target);
+				}
+			}
+		}
+		
+		if ($this->_merge) {
+			$this->_compile($merge_files, $this->_target);
+		}
 	}
 	
 	
 	/**
 	 * Performs a single compile from a file or set of files to a target file.
 	 */
-	protected function _compile($files, $target)
+	protected function _compile($file, $target)
 	{
-		// Create the target directory if it doesn't exist.
-		if (file_exists(dirname($target)) === false) {
-			mkdir(dirname($target), 0755, true);
+		// Verify that the target is not a directory.
+		if ($target->isDirectory()) {
+			throw new BuildException($this->_merge ? 'Merge target must be a file.'
+				: 'Compile target ' . $target->getPath() . ' is a directory.');
 		}
 		
-		if (is_array($files)) {
-			$files = implode(' --js ', $files);
+		// Ensure that the target's containing directory exists. If not, create
+		// the directory.
+		$parent = $target->getParentFile();
+		if ($parent instanceof PhingFile && !$parent->exists()) {
+			mkdir($parent->getPath(), 0755, true);
 		}
 		
-		$cmd = escapeshellcmd("java -jar $this->_compiler_path --charset $this->_charset --compilation_level $this->_compilation_level --js_output_file $target --js $input");
-		$this->log('Compiling: ' . $target);
+		// For merge operations, join a set of files together.
+		if (is_array($file)) {
+			$file = implode(' --js ', $file);
+		}
+		
+		$cmd = escapeshellcmd("java -jar $this->_compiler_path --compilation_level $this->_compilation_level --js_output_file $target --js $file");
+		$this->log($cmd);
 		exec($cmd, $output, $return);
 		
 		if ($return !== 0) {

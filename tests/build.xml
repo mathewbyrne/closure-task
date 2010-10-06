@@ -9,13 +9,14 @@
         <closure target="build">
             <fileset dir="src">
                 <include name="*.js" />
+                <include name="**/*.js" />
             </fileset>
         </closure>
     </target>
 	
 	<target name="compile-src-filelist" description="Compile all files using a filelist">
         <closure target="build">
-            <fileset dir="src" files="foo.js,bar.js"></fileset>
+            <filelist dir="src" files="foo.js,baz/foo.js"></filelist>
         </closure>
     </target>
     
