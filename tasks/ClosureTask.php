@@ -57,6 +57,12 @@ class ClosureTask extends Task
 	
 	
 	/**
+	 * A collection of PhingFile objects to be merge compiled.
+	 */
+	protected $_merge_files = array();
+	
+	
+	/**
 	 * A single file to compile.
 	 */
 	protected $_file = null;
@@ -66,6 +72,12 @@ class ClosureTask extends Task
 	 * An array of FileList and FileSet objects to compile.
 	 */
 	protected $_file_collections = array();
+	
+	
+	/**
+	 * Whether or not to include verbose output.
+	 */
+	protected $_verbose = false;
 	
 	
 	/**
@@ -143,10 +155,22 @@ class ClosureTask extends Task
 	}
 	
 	
+	/**
+	 * Abstraction for adding a File collection object.
+	 */
 	protected function _createFileCollection($collection)
 	{
 		array_push($this->_file_collections, $collection);
 		return $collection;
+	}
+	
+	
+	/**
+	 * If set to true, more verbose output will be given.
+	 */
+	public function setVerbose($verbose)
+	{
+		$this->_verbose = (bool) $verbose;
 	}
 	
 	
@@ -164,7 +188,7 @@ class ClosureTask extends Task
 	
 	
 	/**
-	 * 
+	 * Main entry point for the Task to run.
 	 */
 	public function main()
 	{
@@ -172,18 +196,21 @@ class ClosureTask extends Task
 			throw new BuildException("At least one of the file attributes, a fileset element or a filelist element must be specified.");
 		}
 		
-		if ($this->_merge) {
-			$merge_files = array();
-		}
-		
 		// Handle individual files.
 		if ($this->_file instanceof PhingFile)
 		{
-			//if ($this->_merge) {
-			//	$merge_files[] = $this->_file;
-			//} else {
-			//	$this->_compile($file, $target);
-			//}
+			if ($this->_merge) {
+				$this->merge_files[] = $this->_file;
+			} else {
+				if ($this->_target->isDirectory()) {
+					$file_name = $this->_file->getPathWithoutBase($this->project->getBaseDir());
+					$target    = new PhingFile($this->_target, $file_name);
+				} else {
+					$target = $this->_target;
+				}
+				
+				$this->_compile($file, $target);
+			}
 		}
 		
 		// Handle FileSets and FileLists
@@ -203,7 +230,7 @@ class ClosureTask extends Task
 				
 				if ($this->_merge)
 				{
-					$merge_files[] = $file;
+					$this->merge_files[] = $file;
 				}
 				else
 				{
@@ -214,7 +241,7 @@ class ClosureTask extends Task
 		}
 		
 		if ($this->_merge) {
-			$this->_compile($merge_files, $this->_target);
+			$this->_compile($this->merge_files, $this->_target);
 		}
 	}
 	
@@ -243,7 +270,8 @@ class ClosureTask extends Task
 		}
 		
 		$cmd = escapeshellcmd("java -jar $this->_compiler_path --compilation_level $this->_compilation_level --js_output_file $target --js $file");
-		$this->log($cmd);
+		$this->log($this->_verbose ? $cmd : 'Compiling: ' . $target);
+		
 		exec($cmd, $output, $return);
 		
 		if ($return !== 0) {
