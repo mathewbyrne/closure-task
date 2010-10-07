@@ -10,10 +10,10 @@
  */
 
 
-require_once 'phing/Task.php';
+require_once 'FileTask.php';
 
  
-class ClosureTask extends Task
+class ClosureTask extends FileTask
 {
 	
 	const WHITESPACE_ONLY        = 'WHITESPACE_ONLY';
@@ -63,24 +63,6 @@ class ClosureTask extends Task
 	
 	
 	/**
-	 * A single file to compile.
-	 */
-	protected $_file = null;
-	
-	
-	/**
-	 * An array of FileList and FileSet objects to compile.
-	 */
-	protected $_file_collections = array();
-	
-	
-	/**
-	 * Whether or not to include verbose output.
-	 */
-	protected $_verbose = false;
-	
-	
-	/**
 	 * Sets the compilation level. Must be one of the predefined constants
 	 * contained in self::$compilation_level, of a BuildException will be 
 	 * thrown.
@@ -107,70 +89,12 @@ class ClosureTask extends Task
 	
 	
 	/**
-	 * The target location to which output should be direted. If merge is set
-	 * then this should be a file. Otherwise it should be a target directory.
-	 */
-	public function setTarget(PhingFile $target)
-	{
-		$this->_target = $target;
-	}
-	
-	
-	/**
 	 * If set to true, all source files will be merged into a single source
 	 * file $this->_target.
 	 */
 	public function setMerge($merge)
 	{
 		$this->_merge = (bool) $merge;
-	}
-	
-	
-	/**
-	 * Sets the single file to be operated upon.
-	 */
-	public function setFile(PhingFile $file)
-	{
-		$this->_file = $file;
-	}
-	
-	
-	/**
-	 * Pushes a new FileList object onto $this->_file_lists and returns it
-	 * for population.
-	 */
-	function createFileList()
-	{
-		return $this->_createFileCollection(new FileList());
-	}
-	
-	
-	/**
-	 * Pushes a new FileSet object onto $this->_file_lists and returns it
-	 * for population.
-	 */
-	public function createFileSet()
-	{
-		return $this->_createFileCollection(new FileSet());
-	}
-	
-	
-	/**
-	 * Abstraction for adding a File collection object.
-	 */
-	protected function _createFileCollection($collection)
-	{
-		array_push($this->_file_collections, $collection);
-		return $collection;
-	}
-	
-	
-	/**
-	 * If set to true, more verbose output will be given.
-	 */
-	public function setVerbose($verbose)
-	{
-		$this->_verbose = (bool) $verbose;
 	}
 	
 	
