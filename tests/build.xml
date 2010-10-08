@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="closuretask" default="compile-src-fileset">
 	
-    <taskdef name="closure" classname="ClosureTask">
-		<classpath dir="../tasks" />
-	</taskdef>
+	<includepath classpath="../tasks" />
+	
+    <taskdef name="closure" classname="ClosureTask" />
+	<taskdef name="growl" classname="GrowlTask" />
 	
     <target name="compile-src-fileset" description="Compile all files using a fileset">
         <closure target="build">
@@ -30,6 +31,13 @@
 	
 	<target name="compile-single-file" description="Compile a single file.">
 		<closure file="src/foo.js" target="build"></closure>
+	</target>
+	
+	<target name="growl">
+		<growl message="Testing message parameter." />
+		<growl>Testing text message parameter.</growl>
+		<growl message="Testing the log parameter." log="true" />
+		<growl sender="growl target" message="Testing the sender parameter." log="true" />
 	</target>
 	
 </project>
