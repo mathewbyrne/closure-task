@@ -78,7 +78,7 @@ class YuiCompressorTask extends FileTask
 	 */
 	public function main()
 	{
-		if (!($this->_file instanceof Phing_File)  && !count($this->_file_collections)) {
+		if (!($this->_file instanceof PhingFile)  && !count($this->_file_collections)) {
 			throw new BuildException("At least one of the file attributes, a fileset element or a filelist element must be specified.");
 		}
 
@@ -86,13 +86,12 @@ class YuiCompressorTask extends FileTask
 		if ($this->_file instanceof PhingFile)
 		{
 			if ($this->_target->isDirectory()) {
-				$file_name = $this->_file->getPathWithoutBase($this->project->getBaseDir());
-				$target    = new PhingFile($this->_target, $file_name);
+				$target = new PhingFile($this->_target, $this->_file->getName());
 			} else {
 				$target = $this->_target;
 			}
 			
-			$this->_compress($file, $target);
+			$this->_compress($this->_file, $target);
 		}
 
 		// Handle FileSets and FileLists

@@ -1,0 +1,20 @@
+
+/**
+ * Some test CSS.
+ */
+
+#testing {
+	background: rgb(127, 127, 127);
+	padding: 1em 0.5em;
+}
+
+.another_rule {
+	font-size: 2em;
+	margin: 1em;
+	border-top: 1px solid #f00;
+}
+
+/* More rules */
+input[type=radio] {
+	display: inline-block;
+}

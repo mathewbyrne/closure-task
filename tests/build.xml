@@ -5,6 +5,7 @@
 	
     <taskdef name="closure" classname="ClosureTask" />
 	<taskdef name="growl" classname="GrowlTask" />
+	<taskdef name="yuicompressor" classname="YuiCompressorTask" />
 	
     <target name="compile-src-fileset" description="Compile all files using a fileset">
         <closure target="build">
@@ -38,6 +39,10 @@
 		<growl>Testing text message parameter.</growl>
 		<growl message="Testing the log parameter." log="true" />
 		<growl sender="growl target" message="Testing the sender parameter." log="true" />
+	</target>
+	
+	<target name="yuicompressor">
+		<yuicompressor file="src/test.css" target="build" verbose="true" />
 	</target>
 	
 </project>
