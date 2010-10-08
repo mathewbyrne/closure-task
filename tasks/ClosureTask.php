@@ -121,13 +121,12 @@ class ClosureTask extends FileTask
 				$this->merge_files[] = $this->_file;
 			} else {
 				if ($this->_target->isDirectory()) {
-					$file_name = $this->_file->getPathWithoutBase($this->project->getBaseDir());
-					$target    = new PhingFile($this->_target, $file_name);
+					$target = new PhingFile($this->_target, $this->_file->getName());
 				} else {
 					$target = $this->_target;
 				}
 				
-				$this->_compile($file, $target);
+				$this->_compile($->_file, $target);
 			}
 		}
 		
