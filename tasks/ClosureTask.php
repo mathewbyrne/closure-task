@@ -44,12 +44,6 @@ class ClosureTask extends FileTask
 	
 	
 	/**
-	 * The path to which the source files should compile to.
-	 */
-	protected $_target = '.';
-	
-	
-	/**
 	 * If set to true then all specified files will be merged together into
 	 * a single output source, defined by $this->_target.
 	 */
