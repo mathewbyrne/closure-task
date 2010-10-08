@@ -28,7 +28,7 @@ class ClosureTask extends FileTask
 		);
 	
 	
-	const COMPILER_PATH_ENV_VARIABLE = 'CLOSURE_JAR';
+	const CLOSURE_JAR_ENV_VARIABLE = 'CLOSURE_JAR';
 	
 	
 	/**
@@ -40,7 +40,7 @@ class ClosureTask extends FileTask
 	/**
 	 * The path to the closure compiler jar file.
 	 */
-	protected $_compiler_path = 'compiler.jar';
+	protected $_closure_jar = 'compiler.jar';
 	
 	
 	/**
@@ -76,9 +76,9 @@ class ClosureTask extends FileTask
 	 * here, and the build will throw an exception if the compiler jar is not
 	 * found when a compile is attempted.
 	 */
-	public function setCompilerPath($compiler_path)
+	public function setClosureJar($closure_jar)
 	{
-		$this->_compiler_path = (string) $compiler_path;
+		$this->_closure_jar = (string) $closure_jar;
 	}
 	
 	
@@ -99,8 +99,8 @@ class ClosureTask extends FileTask
 	public function init()
 	{
 		// Set the compiler_path variable from environment variable
-		if ($compiler_path = getenv(self::COMPILER_PATH_ENV_VARIABLE)) {
-			$this->setCompilerPath($compiler_path);
+		if ($closure_jar = getenv(self::CLOSURE_JAR_ENV_VARIABLE)) {
+			$this->setClosureJar($closure_jar);
 		}
 	}
 	
@@ -110,7 +110,7 @@ class ClosureTask extends FileTask
 	 */
 	public function main()
 	{
-		if ($this->_file === null && !count($this->_file_collections)) {
+		if (!($this->_file instanceof Phing_File)  && !count($this->_file_collections)) {
 			throw new BuildException("At least one of the file attributes, a fileset element or a filelist element must be specified.");
 		}
 		
@@ -192,7 +192,7 @@ class ClosureTask extends FileTask
 			$file = implode(' --js ', $file);
 		}
 		
-		$cmd = escapeshellcmd("java -jar $this->_compiler_path --compilation_level $this->_compilation_level --js_output_file $target --js $file");
+		$cmd = escapeshellcmd("java -jar $this->_closure_jar --compilation_level $this->_compilation_level --js_output_file $target --js $file");
 		$this->log($this->_verbose ? $cmd : 'Compiling: ' . $target);
 		
 		exec($cmd, $output, $return);
