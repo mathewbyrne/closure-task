@@ -126,7 +126,7 @@ class ClosureTask extends FileTask
 					$target = $this->_target;
 				}
 				
-				$this->_compile($->_file, $target);
+				$this->_compile($this->_file, $target);
 			}
 		}
 		
