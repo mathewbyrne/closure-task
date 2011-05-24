@@ -166,11 +166,17 @@ class ClosureTask extends FileTask
 	/**
 	 * Performs a single compile from a file or set of files to a target file.
 	 */
-	protected function _compile($file, $target)
+	protected function _compile($files, $target)
 	{
+		if (!is_array($files)) {
+			$files = array($files);
+		}
+		
 		// Verify that we're not about to overwrite the source file.
-		if ($file instanceof Phing_File && $file->getAbsolutePath() == $target->getAbsolutePath()) {
-			throw new BuildException('Source file cannot compile to itself.');
+		foreach ($files as $file) {
+			if ($file instanceof Phing_File && $file->getAbsolutePath() == $target->getAbsolutePath()) {
+				throw new BuildException('Source file cannot compile to itself.');
+			}
 		}
 		
 		// Verify that the target is not a directory.
@@ -187,11 +193,9 @@ class ClosureTask extends FileTask
 		}
 		
 		// For merge operations, join a set of files together.
-		if (is_array($file)) {
-			$file = implode(' --js ', $file);
-		}
+		$files = implode(' --js ', $files);
 		
-		$cmd = escapeshellcmd("java -jar $this->_closure_jar --compilation_level $this->_compilation_level --js_output_file $target --js $file");
+		$cmd = escapeshellcmd("java -jar $this->_closure_jar --compilation_level $this->_compilation_level --js_output_file $target --js $files");
 		$this->log($this->_verbose ? $cmd : 'Compiling: ' . $target);
 		
 		exec($cmd, $output, $return);
