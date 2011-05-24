@@ -169,7 +169,7 @@ class ClosureTask extends FileTask
 	protected function _compile($file, $target)
 	{
 		// Verify that we're not about to overwrite the source file.
-		if ($file->getAbsolutePath() == $target->getAbsolutePath()) {
+		if ($file instanceof Phing_File && $file->getAbsolutePath() == $target->getAbsolutePath()) {
 			throw new BuildException('Source file cannot compile to itself.');
 		}
 		
